@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // If there are several keys assigned to the same command, the last one
 // will be the one displayed on the command help screen. Keys assigned

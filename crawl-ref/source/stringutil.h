@@ -8,7 +8,6 @@
 #include <vector>
 #include <set>
 
-#include "config.h"
 #include "libutil.h" // always_true
 
 #ifdef CRAWL_HAVE_STRLCPY

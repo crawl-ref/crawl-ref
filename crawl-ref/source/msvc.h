@@ -14,6 +14,8 @@
 
 #include <io.h>
 #include <math.h>
+#include <chrono>
+#include <thread>
 
 #define fileno _fileno
 #define snprintf _snprintf
@@ -25,11 +27,6 @@
 #define putenv _putenv
 #define strtoll _strtoi64
 
-// No va_copy in MSVC
-#if !defined(va_copy)
-#define va_copy(dst, src) \
-   ((void) memcpy(&(dst), &(src), sizeof(va_list)))
-#endif
 // These are not defined in MSVC version of stat.h
 #define        S_IWUSR        S_IWRITE
 #define        S_IRUSR        S_IREAD
@@ -66,16 +63,6 @@ static inline double atan2(int x, int y)
     return atan2((double)x, (double)y);
 }
 
-static inline double pow(int x, double y)
-{
-    return pow((double)x, y);
-}
-
-static inline double pow(int x, int y)
-{
-    return pow((double)x, y);
-}
-
 static inline double log(int x)
 {
     return log((double)x);
@@ -84,6 +71,11 @@ static inline double log(int x)
 static inline double log2(double n)
 {
     return log(n) / log(2.0);
+}
+
+static inline void usleep(unsigned int usec)
+{
+	std::this_thread::sleep_for(std::chrono::microseconds(usec));
 }
 
 //this is targeting for struct member name in store.h, nothing else gets affected as of 0.9.0

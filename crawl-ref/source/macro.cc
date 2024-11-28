@@ -1320,7 +1320,7 @@ public:
                 add_entry(new MenuEntry("clear", 'c',
                     [this](const MenuEntry &)
                     {
-                        action.clear();
+                        this->action.clear();
                         return false;
                     }));
             }

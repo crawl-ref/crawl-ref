@@ -7,8 +7,6 @@
 
 #include <sys/types.h>
 
-#include "config.h"
-
 bool lock_file(int fd, bool write, bool wait = false);
 bool unlock_file(int fd);
 
