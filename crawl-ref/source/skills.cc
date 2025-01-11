@@ -2098,9 +2098,7 @@ string skill_title_by_rank(skill_type best_skill, uint8_t skill_rank,
                 for (god_iterator it; it; ++it)
                 {
                     if (player_under_penance(*it))
-                    {
                         result = god_title(*it, species, piety);
-                    }
                 }
             }
         if (result.empty())
