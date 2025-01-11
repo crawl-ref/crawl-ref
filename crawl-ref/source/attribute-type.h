@@ -72,7 +72,6 @@ enum attribute_type
 #endif
     ATTR_GOD_WRATH_XP,         // How much XP before our next god wrath check?
     ATTR_GOD_WRATH_COUNT,      // Number of stored retributions
-    ATTR_TRAITOR,              // God who has been abandoned with an invocations title
     ATTR_NEXT_DRAGON_TIME,     // aut remaining until Dragon's Call summons another
     ATTR_GOLD_GENERATED,       // Count gold generated on non-Abyss levels this game.
 #if TAG_MAJOR_VERSION == 34
@@ -105,5 +104,6 @@ enum attribute_type
 #endif
     ATTR_DEATHS_DOOR_HP,       // How much HP we should have under Death's Door
     ATTR_VOUCHER,              // How many shop vouchers you have
+    ATTR_TRAITOR,              // God who has been abandoned with an invocations title
     NUM_ATTRIBUTES
 };
