@@ -36,6 +36,7 @@ enum unrand_flag_type
                               // =0x100,  // was UNRAND_FLAG_RANDAPP
     UNRAND_FLAG_UNIDED           =0x200,
     UNRAND_FLAG_SKIP_EGO         =0x400,
+    UNRAND_FLAG_DELETED          =0x800,
     // Please make sure it fits in unrandart_entry.flags (currently 16 bits).
 };
 

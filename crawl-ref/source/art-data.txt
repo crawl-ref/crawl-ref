@@ -72,6 +72,7 @@
 # * chaotic:  Is treated as a chaotic item.
 # * clarity:  Provides clarity.
 # * corrode:  Randomly causes corrosion when taking damage.
+# * deleted:  Never randomly generated. Should only appear in old games.
 # * drain:    Causes draining when unequipped.
 # * elec:     Grants electrical resistance.
 # * evil:     Is treated as an evil item (hated by good gods).
@@ -387,7 +388,7 @@ TILE:    urand_bloodbane
 TILE_EQ: bloodbane
 BRAND:   SPWPN_DRAINING
 ANGRY:   5
-BOOL:    nogen
+BOOL:    deleted
 STEALTH: -1
 # end TAG_MAJOR_VERSION
 
@@ -402,7 +403,7 @@ TILE_EQ: flaming_death
 BRAND:   SPWPN_FLAMING
 FIRE:    2
 COLD:    -1
-BOOL:    poison, skip_ego, nogen
+BOOL:    poison, skip_ego, deleted
 WILL:    1
 # end TAG_MAJOR_VERSION
 
@@ -443,10 +444,10 @@ BRAND:   SPWPN_FREEZING
 FIRE:    -1
 COLD:    2
 WILL:    1
-BOOL:    poison, skip_ego, nogen
+BOOL:    poison, skip_ego, deleted
 # end TAG_MAJOR_VERSION
 
-# TAG_MAJOR_VERSION == 34
+# start TAG_MAJOR_VERSION == 34
 NAME:     dagger "Morg"
 OBJ:      OBJ_WEAPONS/WPN_DAGGER
 PLUS:     +4
@@ -456,7 +457,7 @@ TILE_EQ:  morg
 BRAND:    SPWPN_PAIN
 INT:      5
 WILL:     1
-BOOL:     nogen
+BOOL:     deleted
 # end TAG_MAJOR_VERSION
 
 NAME:    scythe "Finisher"
@@ -589,7 +590,7 @@ BRAND:    SPWPN_REAPING
 FB_BRAND: SPWPN_PAIN
 HP:       -6
 LIFE:     1
-BOOL:     poison, nogen
+BOOL:     poison, deleted
 # end TAG_MAJOR_VERSION
 
 NAME:     trident of the Octopus King
@@ -650,7 +651,7 @@ TILE:    urand_piercer
 TILE_EQ: great_bow
 BRAND:   SPWPN_PENETRATION
 EV:      -2
-BOOL:    nogen
+BOOL:    deleted
 # end TAG_MAJOR_VERSION
 
 # start TAG_MAJOR_VERSION == 34
@@ -665,7 +666,7 @@ COLOUR:  ETC_DEATH
 TILE:    urand_blowgun
 TILE_EQ: great_bow
 STEALTH: 2
-BOOL:    inv, tilerim, nogen
+BOOL:    inv, tilerim, deleted
 # end TAG_MAJOR_VERSION
 
 NAME:    lance "Wyrmbane"
@@ -744,7 +745,7 @@ PLUS:     +27
 COLOUR:   LIGHTCYAN
 TILE:     urand_knife_of_accuracy
 TILE_EQ:  knife_of_accuracy
-BOOL:     tilerim, nogen
+BOOL:     tilerim, deleted
 # end TAG_MAJOR_VERSION
 
 # start TAG_MAJOR_VERSION == 34
@@ -757,7 +758,7 @@ COLOUR:   GREEN
 TILE:     urand_crystal_spear
 TILE_EQ:  crystal_spear
 INT:      3
-BOOL:     nogen
+BOOL:     deleted
 # end TAG_MAJOR_VERSION
 
 ENUM:     CAPTAIN
@@ -823,7 +824,7 @@ COLOUR:  RED
 TILE:    urand_bullseye
 TILE_EQ: kite_shield_bullseye
 EV:      -5
-BOOL:    nogen
+BOOL:    deleted
 # end TAG_MAJOR_VERSION
 
 NAME:    crown of Dyrovepreva
@@ -869,7 +870,7 @@ COLOUR:   ETC_FLASH
 TILE:     urand_flash
 TILE_EQ:  red
 EV:       4
-BOOL:     fly, nogen
+BOOL:     fly, deleted
 # end TAG_MAJOR_VERSION
 
 ENUM:     HOOD_ASSASSIN
@@ -1093,7 +1094,7 @@ TILE:    urand_cekugob
 AC:      1
 EV:      1
 LIFE:    2
-BOOL:    elec, poison, notelep, nogen
+BOOL:    elec, poison, notelep, deleted
 # end TAG_MAJOR_VERSION
 
 NAME:    amulet of the Four Winds
@@ -1308,7 +1309,7 @@ PLUS:     +3
 BRAND:    SPARM_JUMPING
 COLOUR:   LIGHTMAGENTA
 STEALTH:  1
-BOOL:     nogen
+BOOL:     deleted
 # end TAG_MAJOR_VERSION
 
 NAME:     dark maul
@@ -1334,7 +1335,7 @@ TILE_EQ: wizard_lightgreen
 PLUS:    +2
 BRAND:   SPARM_ARCHMAGI
 STEALTH: -1
-BOOL:    nogen
+BOOL:    deleted
 # end TAG_MAJOR_VERSION
 
 NAME:     arc blade
@@ -1444,7 +1445,7 @@ TILE_EQ: etheric_cage
 INSCRIP: RegenMP+
 PLUS:    +0
 MP:      +4
-BOOL:    mutate, elec, chaotic, nogen
+BOOL:    mutate, elec, chaotic, deleted
 VALUE:   400
 # end TAG_MAJOR_VERSION
 
@@ -1458,7 +1459,7 @@ TILE:    urand_eternal_torment
 TILE_EQ: eternal_torment
 INSCRIP: rTorment HP--
 LIFE:    3
-BOOL:    evil, seeinv, nogen, drain
+BOOL:    evil, seeinv, drain, deleted
 # end TAG_MAJOR_VERSION
 
 ENUM:    VINES
@@ -1509,7 +1510,7 @@ TILE_EQ:  talos
 COLOUR:   ETC_FIRE
 BRAND:    SPARM_PONDEROUSNESS
 FIRE:     1
-BOOL:     nogen
+BOOL:     deleted
 # end TAG_MAJOR_VERSION
 
 ENUM:     WARLOCK_MIRROR
