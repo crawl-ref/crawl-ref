@@ -752,6 +752,12 @@ void dec_penance(god_type god, int val)
         return;
     }
 
+    if (you.attribute[ATTR_TRAITOR] > 0)
+    {
+        you.attribute[ATTR_TRAITOR]--;
+        you.redraw_title = true;
+    }
+
     // We only get this far if we just mollified a god.
     // If we just mollified a god, see if we have any angry gods left.
     // If we don't, clear the stored wrath / XP counter.
@@ -3110,6 +3116,9 @@ void excommunication(bool voluntary, god_type new_god)
     default:
         break;
     }
+
+    if (best_skill(SK_FIRST_SKILL, SK_LAST_SKILL) == SK_INVOCATIONS)
+        you.attribute[ATTR_TRAITOR]++;
 
     _set_wrath_penance(old_god);
 
