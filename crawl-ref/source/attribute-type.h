@@ -72,7 +72,7 @@ enum attribute_type
 #endif
     ATTR_GOD_WRATH_XP,         // How much XP before our next god wrath check?
     ATTR_GOD_WRATH_COUNT,      // Number of stored retributions
-    ATTR_TRAITOR,              // Abandoned a god while having an invocations title
+    ATTR_TRAITOR,              // God who has been abandoned with an invocations title
     ATTR_NEXT_DRAGON_TIME,     // aut remaining until Dragon's Call summons another
     ATTR_GOLD_GENERATED,       // Count gold generated on non-Abyss levels this game.
 #if TAG_MAJOR_VERSION == 34

@@ -2094,13 +2094,12 @@ string skill_title_by_rank(skill_type best_skill, uint8_t skill_rank,
         }
         // Make sure the traitor induced title overrides under penance
         if (you.attribute[ATTR_TRAITOR] > 0)
-            {
-                for (god_iterator it; it; ++it)
-                {
-                    if (player_under_penance(*it))
-                        result = god_title(*it, species, piety);
-                }
-            }
+        {
+            god_type betrayed_god = static_cast<god_type>(
+                you.attribute[ATTR_TRAITOR]);
+            result = god_title(betrayed_god, species, piety);
+        }
+
         if (result.empty())
             result = skill_titles[best_skill][skill_rank];
     }
