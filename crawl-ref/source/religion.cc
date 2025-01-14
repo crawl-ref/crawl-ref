@@ -616,21 +616,13 @@ god_iterator god_iterator::operator++(int)
     return copy;
 }
 
-void handle_traitor()
+void handle_traitor(god_type god)
 {
-    if (you.attribute[ATTR_TRAITOR] > 0)
-    {
-        you.attribute[ATTR_TRAITOR] = 0;
-        for (god_iterator it; it; ++it)
-            {
-                if (player_under_penance(*it) && !you_worship(*it))
-                {
-                    you.attribute[ATTR_TRAITOR] = static_cast<int>(*it);
-                    break;
-                }
-            }
-        you.redraw_title = true;
-    }
+    if (static_cast<god_type>(you.attribute[ATTR_TRAITOR]) == god)
+        {
+            you.attribute[ATTR_TRAITOR] = 0;
+            you.redraw_title = true;
+        }
 }
 
 bool active_penance(god_type god)
@@ -768,7 +760,7 @@ void dec_penance(god_type god, int val)
         return;
     }
 
-    handle_traitor();
+    handle_traitor(god);
 
     // We only get this far if we just mollified a god.
     // If we just mollified a god, see if we have any angry gods left.
@@ -2848,6 +2840,12 @@ void excommunication(bool voluntary, god_type new_god)
 
     you.religion = GOD_NO_GOD;
 
+    if (best_skill(SK_FIRST_SKILL, SK_LAST_SKILL) == SK_INVOCATIONS
+       && you.attribute[ATTR_TRAITOR] == 0)
+    {
+        you.attribute[ATTR_TRAITOR] = static_cast<int>(old_god);
+    }
+
     you.redraw_title = true;
 
     // Renouncing may have changed the conducts on our wielded or
@@ -3128,9 +3126,6 @@ void excommunication(bool voluntary, god_type new_god)
     default:
         break;
     }
-
-    if (best_skill(SK_FIRST_SKILL, SK_LAST_SKILL) == SK_INVOCATIONS)
-        you.attribute[ATTR_TRAITOR] = static_cast<int>(old_god);
 
     _set_wrath_penance(old_god);
 
@@ -3578,7 +3573,7 @@ static void _set_initial_god_piety()
         break;
     }
 
-    handle_traitor();
+    handle_traitor(you.religion);
 
     // Tutorial needs berserk usable.
     if (crawl_state.game_is_tutorial())
