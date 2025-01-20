@@ -429,7 +429,7 @@ void wizard_map_level()
     for (rectangle_iterator ri(BOUNDARY_BORDER - 1); ri; ++ri)
     {
         update_item_at(*ri, true);
-        show_update_at(*ri, LAYER_ITEMS);
+        show_update_at(*ri, Layer::ITEMS);
 
 #ifdef USE_TILE
         tiles.update_minimap(*ri);

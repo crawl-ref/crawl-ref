@@ -520,7 +520,7 @@ void force_show_update_at(const coord_def &gp, layers_type layers)
     if (!in_bounds(gp))
         return;
 
-    if (layers & LAYER_MONSTERS)
+    if (layers & Layer::MONSTERS)
     {
         monster* mons = monster_at(gp);
         if (mons && mons->alive())
@@ -529,11 +529,11 @@ void force_show_update_at(const coord_def &gp, layers_type layers)
             _mark_invisible_at(gp);
     }
 
-    if (layers & LAYER_CLOUDS)
+    if (layers & Layer::CLOUDS)
         if (cloud_struct* cloud = cloud_at(gp))
             _update_cloud(*cloud);
 
-    if (layers & LAYER_ITEMS)
+    if (layers & Layer::ITEMS)
         update_item_at(gp);
 }
 

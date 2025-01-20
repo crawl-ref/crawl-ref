@@ -38,6 +38,7 @@
 #include "end.h"
 #include "errors.h"
 #include "explore-greedy-options.h"
+#include "explore-stop-options.h"
 #include "files.h"
 #include "game-options.h"
 #include "ghost.h"
@@ -3094,28 +3095,27 @@ void game_options::update_travel_terrain()
     }
 }
 
+
 void game_options::update_use_animations()
 {
+    static const std::map<const string, use_animation_type> ANIMATION_TYPES =
+    {
+        {  "beam", UA_BEAM },
+        {  "range", UA_RANGE },
+        {  "hp", UA_HP },
+        {  "monster_in_sight", UA_MONSTER_IN_SIGHT },
+        {  "pickup", UA_PICKUP },
+        {  "monster", UA_MONSTER },
+        {  "player", UA_PLAYER },
+        {  "branch_entry", UA_BRANCH_ENTRY }
+    };
+
     use_animations_type animations = UA_ALWAYS_ON; // not 0!
     for (const string &type : use_animations_option)
     {
-        // TODO: dataify into a map
-        if (type == "beam")
-            animations |= UA_BEAM;
-        else if (type == "range")
-            animations |= UA_RANGE;
-        else if (type == "hp")
-            animations |= UA_HP;
-        else if (type == "monster_in_sight")
-            animations |= UA_MONSTER_IN_SIGHT;
-        else if (type == "pickup")
-            animations |= UA_PICKUP;
-        else if (type == "monster")
-            animations |= UA_MONSTER;
-        else if (type == "player")
-            animations |= UA_PLAYER;
-        else if (type == "branch_entry")
-            animations |= UA_BRANCH_ENTRY;
+        const auto search = ANIMATION_TYPES.find(type);
+        if (search != ANIMATION_TYPES.end())
+            animations |= search->second;
         else
             report_error("Unknown animation type '%s'", type.c_str());
     }
@@ -3125,50 +3125,40 @@ void game_options::update_use_animations()
 
 void game_options::update_explore_stop_conditions()
 {
+    // Note: if altering these, make sure the same alternative spellings appear
+    // in update_explore_greedy_visit_conditions if relevant.
+    static const std::map<const string, explore_stop_options> STOP_CONDITIONS =
+    {
+        { "item", ES_ITEM }, { "items", ES_ITEM },
+        { "greedy_pickup", ES_GREEDY_PICKUP },
+        { "greedy_pickup_gold", ES_GREEDY_PICKUP_GOLD },
+        { "greedy_pickup_smart", ES_GREEDY_PICKUP_SMART },
+        { "greedy_pickup_thrown", ES_GREEDY_PICKUP_THROWN },
+        { "shop" , ES_SHOP }, { "shops", ES_SHOP },
+        { "stair", ES_STAIR }, { "stairs", ES_STAIR },
+        { "branch" , ES_BRANCH }, { "branches", ES_BRANCH },
+        { "portal", ES_PORTAL }, { "portals", ES_PORTAL },
+        { "altar", ES_ALTAR }, { "altars", ES_ALTAR },
+        { "runed_door", ES_RUNED_DOOR }, { "runed_doors", ES_RUNED_DOOR },
+        { "transporter", ES_TRANSPORTER }, { "transporters", ES_TRANSPORTER },
+        { "greedy_item", ES_GREEDY_ITEM }, { "greedy_items", ES_GREEDY_ITEM },
+        { "greedy_visited_item_stack", ES_GREEDY_VISITED_ITEM_STACK },
+        { "glowing" , ES_GLOWING_ITEM }, { "glowing_item", ES_GLOWING_ITEM },
+        { "glowing_items", ES_GLOWING_ITEM },
+        { "artefact", ES_ARTEFACT }, { "artefacts", ES_ARTEFACT },
+        { "artifact", ES_ARTEFACT }, { "artifacts", ES_ARTEFACT },
+        { "rune", ES_RUNE }, { "runes", ES_RUNE },
+    };
     // convert the options list into a bitfield, and save it by side-effect
     // into game_options::explore_stop. List processing is handled by the
     // option update code, and we can ignore it here.
     int conditions = ES_NONE;
     for (const string &stop : explore_stop_option)
     {
-        // TODO: dataify into a map
         const string c = replace_all_of(stop, " ", "_");
-        if (c == "item" || c == "items")
-            conditions |= ES_ITEM;
-        else if (c == "greedy_pickup")
-            conditions |= ES_GREEDY_PICKUP;
-        else if (c == "greedy_pickup_gold")
-            conditions |= ES_GREEDY_PICKUP_GOLD;
-        else if (c == "greedy_pickup_smart")
-            conditions |= ES_GREEDY_PICKUP_SMART;
-        else if (c == "greedy_pickup_thrown")
-            conditions |= ES_GREEDY_PICKUP_THROWN;
-        else if (c == "shop" || c == "shops")
-            conditions |= ES_SHOP;
-        else if (c == "stair" || c == "stairs")
-            conditions |= ES_STAIR;
-        else if (c == "branch" || c == "branches")
-            conditions |= ES_BRANCH;
-        else if (c == "portal" || c == "portals")
-            conditions |= ES_PORTAL;
-        else if (c == "altar" || c == "altars")
-            conditions |= ES_ALTAR;
-        else if (c == "runed_door" || c == "runed_doors")
-            conditions |= ES_RUNED_DOOR;
-        else if (c == "transporter" || c == "transporters")
-            conditions |= ES_TRANSPORTER;
-        else if (c == "greedy_item" || c == "greedy_items")
-            conditions |= ES_GREEDY_ITEM;
-        else if (c == "greedy_visited_item_stack")
-            conditions |= ES_GREEDY_VISITED_ITEM_STACK;
-        else if (c == "glowing" || c == "glowing_item"
-                 || c == "glowing_items")
-            conditions |= ES_GLOWING_ITEM;
-        else if (c == "artefact" || c == "artefacts"
-                 || c == "artifact" || c == "artifacts")
-            conditions |= ES_ARTEFACT;
-        else if (c == "rune" || c == "runes")
-            conditions |= ES_RUNE;
+        const auto search = STOP_CONDITIONS.find(c);
+        if (search != STOP_CONDITIONS.end())
+            conditions |= search->second;
         else
             report_error("Unknown explore stop condition '%s'", c.c_str());
     }
@@ -3177,22 +3167,24 @@ void game_options::update_explore_stop_conditions()
 
 void game_options::update_explore_greedy_visit_conditions()
 {
+    // Note: if altering these, make sure the same alternative spellings appear
+    // in update_explore_stop_conditions if relevant.
+    static const std::map<const string, explore_greedy_options> GREEDY_CONDITIONS =
+    {
+        { "glowing", EG_GLOWING },{ "glowing_item", EG_GLOWING },
+        { "glowing_items", EG_GLOWING },
+        { "artefact", EG_ARTEFACT }, { "artefacts", EG_ARTEFACT },
+        { "artifact", EG_ARTEFACT }, { "artifacts", EG_ARTEFACT },
+        { "stack", EG_STACK }, { "stacks", EG_STACK },
+        { "pile", EG_STACK }, { "piles", EG_STACK },
+    };
     int conditions = EG_NONE;
     for (const string &stop : explore_greedy_visit_option)
     {
-        // TODO: dataify into a map
         const string c = replace_all_of(stop, " ", "_");
-        if (c == "glowing" || c == "glowing_item"
-                 || c == "glowing_items")
-        {
-            conditions |= EG_GLOWING;
-        }
-        else if (c == "artefact" || c == "artefacts"
-                 || c == "artifact" || c == "artifacts")
-            conditions |= EG_ARTEFACT;
-        else if (c == "stack" || c == "stacks"
-                 || c == "pile" || c == "piles")
-            conditions |= EG_STACK;
+        const auto search = GREEDY_CONDITIONS.find(c);
+        if (search != GREEDY_CONDITIONS.end())
+            conditions |= search->second;
         else
             report_error("Unknown greedy visit condition '%s'", c.c_str());
     }

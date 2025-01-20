@@ -83,7 +83,7 @@
 #include "xom.h"
 
 static layers_type _layers = LAYERS_ALL;
-static layers_type _layers_saved = LAYERS_NONE;
+static layers_type _layers_saved = Layer::None;
 
 crawl_view_geometry crawl_view;
 
@@ -923,7 +923,7 @@ string screenshot()
     return ss.str();
 }
 
-int viewmap_flash_colour()
+colour_t viewmap_flash_colour()
 {
     // This only shows the fullscreen colour when we're showing all layers,
     // and hides it for parseability's sake when toggling individual layers.
@@ -1710,7 +1710,7 @@ void draw_cell(screen_cell_t *cell, const coord_def &gc,
     else if (!crawl_view.in_los_bounds_g(gc))
         _draw_outside_los(cell, gc, coord_def());
     else if (gc == you.pos() && you.on_current_level
-             && _layers & LAYER_PLAYER
+             && _layers & Layer::PLAYER
              && !crawl_state.game_is_arena()
              && !crawl_state.arena_suspended)
     {
@@ -1817,7 +1817,7 @@ void draw_cell(screen_cell_t *cell, const coord_def &gc,
     if ((_layers != LAYERS_ALL || Options.always_show_exclusions)
         && you.on_current_level
         && map_bounds(gc)
-        && (_layers == LAYERS_NONE
+        && (_layers == Layer::None
             || gc != you.pos()
                && (env.map_knowledge(gc).monster() == MONS_NO_MONSTER
                    || !you.see_cell(gc)))
@@ -1840,8 +1840,8 @@ static void _config_layers_menu()
     bool exit = false;
 
     _layers = _layers_saved;
-    crawl_state.viewport_weapons    = !!(_layers & LAYER_MONSTER_WEAPONS);
-    crawl_state.viewport_monster_hp = !!(_layers & LAYER_MONSTER_HEALTH);
+    crawl_state.viewport_weapons    = !!(_layers & Layer::MONSTER_WEAPONS);
+    crawl_state.viewport_monster_hp = !!(_layers & Layer::MONSTER_HEALTH);
 
     msgwin_set_temporary(true);
     while (!exit)
@@ -1859,20 +1859,20 @@ static void _config_layers_menu()
                            "<%s>monster (h)ealth</%s>"
 #endif
                            ,
-           _layers & LAYER_MONSTERS        ? "lightgrey" : "darkgrey",
-           _layers & LAYER_MONSTERS        ? "lightgrey" : "darkgrey",
-           _layers & LAYER_PLAYER          ? "lightgrey" : "darkgrey",
-           _layers & LAYER_PLAYER          ? "lightgrey" : "darkgrey",
-           _layers & LAYER_ITEMS           ? "lightgrey" : "darkgrey",
-           _layers & LAYER_ITEMS           ? "lightgrey" : "darkgrey",
-           _layers & LAYER_CLOUDS          ? "lightgrey" : "darkgrey",
-           _layers & LAYER_CLOUDS          ? "lightgrey" : "darkgrey"
+           _layers & Layer::MONSTERS        ? "lightgrey" : "darkgrey",
+           _layers & Layer::MONSTERS        ? "lightgrey" : "darkgrey",
+           _layers & Layer::PLAYER          ? "lightgrey" : "darkgrey",
+           _layers & Layer::PLAYER          ? "lightgrey" : "darkgrey",
+           _layers & Layer::ITEMS           ? "lightgrey" : "darkgrey",
+           _layers & Layer::ITEMS           ? "lightgrey" : "darkgrey",
+           _layers & Layer::CLOUDS          ? "lightgrey" : "darkgrey",
+           _layers & Layer::CLOUDS          ? "lightgrey" : "darkgrey"
 #ifndef USE_TILE_LOCAL
            ,
-           _layers & LAYER_MONSTER_WEAPONS ? "lightgrey" : "darkgrey",
-           _layers & LAYER_MONSTER_WEAPONS ? "lightgrey" : "darkgrey",
-           _layers & LAYER_MONSTER_HEALTH  ? "lightgrey" : "darkgrey",
-           _layers & LAYER_MONSTER_HEALTH  ? "lightgrey" : "darkgrey"
+           _layers & Layer::MONSTER_WEAPONS ? "lightgrey" : "darkgrey",
+           _layers & Layer::MONSTER_WEAPONS ? "lightgrey" : "darkgrey",
+           _layers & Layer::MONSTER_HEALTH  ? "lightgrey" : "darkgrey",
+           _layers & Layer::MONSTER_HEALTH  ? "lightgrey" : "darkgrey"
 #endif
         );
         mprf(MSGCH_PROMPT, "Press 'a' to toggle all layers. "
@@ -1880,28 +1880,28 @@ static void _config_layers_menu()
 
         switch (get_ch())
         {
-        case 'm': _layers_saved = _layers ^= LAYER_MONSTERS;        break;
-        case 'p': _layers_saved = _layers ^= LAYER_PLAYER;          break;
-        case 'i': _layers_saved = _layers ^= LAYER_ITEMS;           break;
-        case 'c': _layers_saved = _layers ^= LAYER_CLOUDS;          break;
+        case 'm': _layers_saved = _layers ^= Layer::MONSTERS;        break;
+        case 'p': _layers_saved = _layers ^= Layer::PLAYER;          break;
+        case 'i': _layers_saved = _layers ^= Layer::ITEMS;           break;
+        case 'c': _layers_saved = _layers ^= Layer::CLOUDS;          break;
 #ifndef USE_TILE_LOCAL
-        case 'w': _layers_saved = _layers ^= LAYER_MONSTER_WEAPONS;
-                  if (_layers & LAYER_MONSTER_WEAPONS)
-                      _layers_saved = _layers |= LAYER_MONSTERS;
+        case 'w': _layers_saved = _layers ^= Layer::MONSTER_WEAPONS;
+                  if (_layers & Layer::MONSTER_WEAPONS)
+                      _layers_saved = _layers |= Layer::MONSTERS;
                   break;
-        case 'h': _layers_saved = _layers ^= LAYER_MONSTER_HEALTH;
-                  if (_layers & LAYER_MONSTER_HEALTH)
-                      _layers_saved = _layers |= LAYER_MONSTERS;
+        case 'h': _layers_saved = _layers ^= Layer::MONSTER_HEALTH;
+                  if (_layers & Layer::MONSTER_HEALTH)
+                      _layers_saved = _layers |= Layer::MONSTERS;
                   break;
 #endif
         case 'a': if (_layers)
-                      _layers_saved = _layers = LAYERS_NONE;
+                      _layers_saved = _layers = Layer::None;
                   else
                   {
 #ifndef USE_TILE_LOCAL
                       _layers_saved = _layers = LAYERS_ALL
-                                      | LAYER_MONSTER_WEAPONS
-                                      | LAYER_MONSTER_HEALTH;
+                                      | Layer::MONSTER_WEAPONS
+                                      | Layer::MONSTER_HEALTH;
 #else
                       _layers_saved = _layers = LAYERS_ALL;
 #endif
@@ -1909,14 +1909,14 @@ static void _config_layers_menu()
                   break;
         default:
             _layers = LAYERS_ALL;
-            crawl_state.viewport_weapons    = !!(_layers & LAYER_MONSTER_WEAPONS);
-            crawl_state.viewport_monster_hp = !!(_layers & LAYER_MONSTER_HEALTH);
+            crawl_state.viewport_weapons    = !!(_layers & Layer::MONSTER_WEAPONS);
+            crawl_state.viewport_monster_hp = !!(_layers & Layer::MONSTER_HEALTH);
             exit = true;
             break;
         }
 
-        crawl_state.viewport_weapons    = !!(_layers & LAYER_MONSTER_WEAPONS);
-        crawl_state.viewport_monster_hp = !!(_layers & LAYER_MONSTER_HEALTH);
+        crawl_state.viewport_weapons    = !!(_layers & Layer::MONSTER_WEAPONS);
+        crawl_state.viewport_monster_hp = !!(_layers & Layer::MONSTER_HEALTH);
 
         msgwin_clear_temporary();
     }
@@ -1939,8 +1939,8 @@ void reset_show_terrain()
         mprf(MSGCH_PROMPT, "Restoring view layers.");
 
     _layers = LAYERS_ALL;
-    crawl_state.viewport_weapons    = !!(_layers & LAYER_MONSTER_WEAPONS);
-    crawl_state.viewport_monster_hp = !!(_layers & LAYER_MONSTER_HEALTH);
+    crawl_state.viewport_weapons    = !!(_layers & Layer::MONSTER_WEAPONS);
+    crawl_state.viewport_monster_hp = !!(_layers & Layer::MONSTER_HEALTH);
 }
 
 ////////////////////////////////////////////////////////////////////////////

@@ -2009,16 +2009,19 @@ void vampire_update_transformations()
     }
 }
 
-// TODO: dataify? move to member functions?
 int form_base_movespeed(transformation tran)
 {
     // statue form is handled as a multiplier in player_speed, not a movespeed.
-    if (tran == transformation::bat)
-        return 5; // but allowed minimum is six
-    else if (tran == transformation::pig)
-        return 7;
-    else
-        return 10;
+    switch (tran)
+    {
+        case transformation::bat:
+            return 5; // but allowed minimum is six
+        case transformation::pig:
+            return 7;
+        case transformation::none:
+        default:
+            return 10;
+    }
 }
 
 bool draconian_dragon_exception()

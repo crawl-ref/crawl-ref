@@ -26,7 +26,7 @@ bool magic_mapping(int map_radius, int proportion, bool suppress_msg,
 
 string screenshot();
 
-int viewmap_flash_colour();
+colour_t viewmap_flash_colour();
 bool view_update();
 void view_update_at(const coord_def &pos);
 class targeter;

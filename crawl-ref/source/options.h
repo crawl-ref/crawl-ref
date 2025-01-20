@@ -11,6 +11,7 @@
 #include "confirm-prompt-type.h"
 #include "easy-confirm-type.h"
 #include "explore-greedy-options.h"
+#include "explore-stop-options.h"
 #include "feature.h"
 #include "fixedp.h"
 #include "flang-t.h"
