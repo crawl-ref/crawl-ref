@@ -1352,8 +1352,7 @@ static void _draw_ray_cell(screen_cell_t& cell, coord_def p, bool on_target,
 {
 #ifdef USE_TILE
     UNUSED(on_target, p);
-    cell.tile.dngn_overlay[cell.tile.num_dngn_overlay++] =
-        _tileidx_aff_type(aff);
+    cell.tile.add_overlay(_tileidx_aff_type(aff));
 #endif
     const auto bcol = _colour_aff_type(aff, on_target);
     const auto mbcol = on_target ? bcol : bcol | COLFLAG_REVERSE;
@@ -1419,8 +1418,7 @@ void direction_chooser::draw_beam(crawl_view_buffer &vbuf)
         const bool inrange = in_range(p);
         auto& cell = vbuf(grid2view(p) - 1);
 #ifdef USE_TILE
-        cell.tile.dngn_overlay[cell.tile.num_dngn_overlay++] =
-            inrange ? TILE_RAY : TILE_RAY_OUT_OF_RANGE;
+        cell.tile.add_overlay(inrange ? TILE_RAY : TILE_RAY_OUT_OF_RANGE);
 #endif
         const auto bcol = inrange ? MAGENTA : DARKGREY;
         const auto cglyph = _get_ray_glyph(p, bcol, '*', bcol| COLFLAG_REVERSE);
@@ -1432,8 +1430,8 @@ void direction_chooser::draw_beam(crawl_view_buffer &vbuf)
     // Only draw the ray over the target on tiles.
 #ifdef USE_TILE
     auto& cell = vbuf(grid2view(target()) - 1);
-    cell.tile.dngn_overlay[cell.tile.num_dngn_overlay++] =
-        in_range(ray.pos()) ? TILE_RAY : TILE_RAY_OUT_OF_RANGE;
+    cell.tile.add_overlay(in_range(ray.pos()) ? TILE_RAY :
+                                                TILE_RAY_OUT_OF_RANGE);
 #endif
 }
 

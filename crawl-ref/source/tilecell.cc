@@ -17,6 +17,7 @@
 void packed_cell::clear()
 {
     num_dngn_overlay = 0;
+    dngn_overlay.fill(0);
     fg = 0;
     bg = 0;
     cloud = 0;
@@ -82,9 +83,25 @@ enum wave_type
     WV_DEEP,
 };
 
-static void _add_overlay(int tileidx, packed_cell& cell)
+
+void packed_cell::add_overlay(int tileidx)
 {
-    cell.dngn_overlay[cell.num_dngn_overlay++] = tileidx;
+    // Deduplicate existing identical overlays
+    // There's a ton of ways to implement this.
+    // This way, which does rely on the empty portion of the array being
+    // zeroed, is friendly to auto-vectorization.
+    // Clang 19.1.0 happily auto-vectorizes this on -O2
+    // auto end = dngn_overlay.begin() + num_dngn_overlay;
+    // or something like that might be more efficient for gcc though?
+    auto end = dngn_overlay.end();
+    bool not_present = find(dngn_overlay.begin(), end, tileidx) == end;
+    if (not_present)
+    {
+        const int insert_pos = num_dngn_overlay++;
+        // If we get an assert here, we'll either add a check to ignore
+        // additional overlays or increase the overlay array size.
+        dngn_overlay[insert_pos] = tileidx;
+    }
 }
 
 typedef bool (*map_predicate) (const coord_def&, crawl_view_buffer& vbuf);
@@ -137,7 +154,7 @@ static void _add_directional_overlays(const coord_def& gc, crawl_view_buffer& vb
             continue;
 
         if (dir_mask & (1 << i))
-            _add_overlay(tileidx, cell);
+            cell.add_overlay(tileidx);
 
         tileidx++;
     }
@@ -158,7 +175,7 @@ static void _pack_shoal_waves(const coord_def &gc, crawl_view_buffer& vbuf)
 
     if (feat == DNGN_DEEP_WATER && feat_has_ink)
     {
-        _add_overlay(TILE_WAVE_INK_FULL, cell);
+        cell.add_overlay(TILE_WAVE_INK_FULL);
         return;
     }
 
@@ -287,13 +304,13 @@ static void _pack_shoal_waves(const coord_def &gc, crawl_view_buffer& vbuf)
     {
         // First check for shallow water.
         if (north == WV_SHALLOW)
-            _add_overlay(TILE_WAVE_N, cell);
+            cell.add_overlay(TILE_WAVE_N);
         if (south == WV_SHALLOW)
-            _add_overlay(TILE_WAVE_S, cell);
+            cell.add_overlay(TILE_WAVE_S);
         if (east == WV_SHALLOW)
-            _add_overlay(TILE_WAVE_E, cell);
+            cell.add_overlay(TILE_WAVE_E);
         if (west == WV_SHALLOW)
-            _add_overlay(TILE_WAVE_W, cell);
+            cell.add_overlay(TILE_WAVE_W);
 
         // Then check for deep water, overwriting shallow
         // corner waves, if necessary.
@@ -303,53 +320,53 @@ static void _pack_shoal_waves(const coord_def &gc, crawl_view_buffer& vbuf)
         int mod = (feat == DNGN_SHALLOW_WATER) ? 1 : 0;
 
         if (north == WV_DEEP)
-            _add_overlay(TILE_WAVE_DEEP_N + mod, cell);
+            cell.add_overlay(TILE_WAVE_DEEP_N + mod);
         if (south == WV_DEEP)
-            _add_overlay(TILE_WAVE_DEEP_S + mod, cell);
+            cell.add_overlay(TILE_WAVE_DEEP_S + mod);
         if (east == WV_DEEP)
-            _add_overlay(TILE_WAVE_DEEP_E + mod, cell);
+            cell.add_overlay(TILE_WAVE_DEEP_E + mod);
         if (west == WV_DEEP)
-            _add_overlay(TILE_WAVE_DEEP_W + mod, cell);
+            cell.add_overlay(TILE_WAVE_DEEP_W + mod);
 
         if (ne == WV_SHALLOW && !north && !east)
-            _add_overlay(TILE_WAVE_CORNER_NE, cell);
+            cell.add_overlay(TILE_WAVE_CORNER_NE);
         else if (ne == WV_DEEP && north != WV_DEEP && east != WV_DEEP)
-            _add_overlay(TILE_WAVE_DEEP_CORNER_NE + mod, cell);
+            cell.add_overlay(TILE_WAVE_DEEP_CORNER_NE + mod);
         if (nw == WV_SHALLOW && !north && !west)
-            _add_overlay(TILE_WAVE_CORNER_NW, cell);
+            cell.add_overlay(TILE_WAVE_CORNER_NW);
         else if (nw == WV_DEEP && north != WV_DEEP && west != WV_DEEP)
-            _add_overlay(TILE_WAVE_DEEP_CORNER_NW + mod, cell);
+            cell.add_overlay(TILE_WAVE_DEEP_CORNER_NW + mod);
         if (se == WV_SHALLOW && !south && !east)
-            _add_overlay(TILE_WAVE_CORNER_SE, cell);
+            cell.add_overlay(TILE_WAVE_CORNER_SE);
         else if (se == WV_DEEP && south != WV_DEEP && east != WV_DEEP)
-            _add_overlay(TILE_WAVE_DEEP_CORNER_SE + mod, cell);
+            cell.add_overlay(TILE_WAVE_DEEP_CORNER_SE + mod);
         if (sw == WV_SHALLOW && !south && !west)
-            _add_overlay(TILE_WAVE_CORNER_SW, cell);
+            cell.add_overlay(TILE_WAVE_CORNER_SW);
         else if (sw == WV_DEEP && south != WV_DEEP && west != WV_DEEP)
-            _add_overlay(TILE_WAVE_DEEP_CORNER_SW + mod, cell);
+            cell.add_overlay(TILE_WAVE_DEEP_CORNER_SW + mod);
     }
 
     // Overlay with ink sheen, if necessary.
     if (feat_has_ink)
-        _add_overlay(TILE_WAVE_INK_FULL, cell);
+        cell.add_overlay(TILE_WAVE_INK_FULL);
     else
     {
         if (inkn)
-            _add_overlay(TILE_WAVE_INK_N, cell);
+            cell.add_overlay(TILE_WAVE_INK_N);
         if (inks)
-            _add_overlay(TILE_WAVE_INK_S, cell);
+            cell.add_overlay(TILE_WAVE_INK_S);
         if (inke)
-            _add_overlay(TILE_WAVE_INK_E, cell);
+            cell.add_overlay(TILE_WAVE_INK_E);
         if (inkw)
-            _add_overlay(TILE_WAVE_INK_W, cell);
+            cell.add_overlay(TILE_WAVE_INK_W);
         if (inkne || inkn || inke)
-            _add_overlay(TILE_WAVE_INK_CORNER_NE, cell);
+            cell.add_overlay(TILE_WAVE_INK_CORNER_NE);
         if (inknw || inkn || inkw)
-            _add_overlay(TILE_WAVE_INK_CORNER_NW, cell);
+            cell.add_overlay(TILE_WAVE_INK_CORNER_NW);
         if (inkse || inks || inke)
-            _add_overlay(TILE_WAVE_INK_CORNER_SE, cell);
+            cell.add_overlay(TILE_WAVE_INK_CORNER_SE);
         if (inksw || inks || inkw)
-            _add_overlay(TILE_WAVE_INK_CORNER_SW, cell);
+            cell.add_overlay(TILE_WAVE_INK_CORNER_SW);
     }
 }
 
@@ -413,7 +430,7 @@ static void _pack_default_waves(const coord_def &gc, crawl_view_buffer& vbuf)
             if (ai->x < 0 || ai->x >= vbuf.size().x || ai->y < 0 || ai->y >= vbuf.size().y)
                 continue;
             if (_is_seen_shallow(*ai, vbuf))
-                _add_overlay(tile, cell);
+                cell.add_overlay(tile);
         }
     }
 
@@ -424,15 +441,15 @@ static void _pack_default_waves(const coord_def &gc, crawl_view_buffer& vbuf)
     if (north || west || east && (colour == BLACK || colour == LIGHTGREEN))
     {
         if (north)
-            _add_overlay(TILE_SHORE_N, cell);
+            cell.add_overlay(TILE_SHORE_N);
         if (west)
-            _add_overlay(TILE_SHORE_W, cell);
+            cell.add_overlay(TILE_SHORE_W);
         if (east)
-            _add_overlay(TILE_SHORE_E, cell);
+            cell.add_overlay(TILE_SHORE_E);
         if (north && west)
-            _add_overlay(TILE_SHORE_NW, cell);
+            cell.add_overlay(TILE_SHORE_NW);
         if (north && east)
-            _add_overlay(TILE_SHORE_NE, cell);
+            cell.add_overlay(TILE_SHORE_NE);
     }
 }
 
@@ -459,27 +476,27 @@ static void _pack_wall_shadows(const coord_def &gc, crawl_view_buffer& vbuf,
     if (_is_seen_wall(coord_def(gc.x - 1, gc.y), vbuf))
     {
         offset = _is_seen_wall(coord_def(gc.x - 1, gc.y - 1), vbuf) ? 0 : 5;
-        _add_overlay(tile + offset, cell);
+        cell.add_overlay(tile + offset);
         nw = 1;
     }
     if (_is_seen_wall(coord_def(gc.x, gc.y - 1), vbuf))
     {
-        _add_overlay(tile + 2, cell);
+        cell.add_overlay(tile + 2);
         ne = 1;
         nw = 1;
     }
     if (_is_seen_wall(coord_def(gc.x + 1, gc.y), vbuf))
     {
         offset = _is_seen_wall(coord_def(gc.x + 1, gc.y - 1), vbuf) ? 4 : 6;
-        _add_overlay(tile + offset, cell);
+        cell.add_overlay(tile + offset);
         ne = 1;
     }
 
     // corners
     if (nw == 0 && _is_seen_wall(coord_def(gc.x - 1, gc.y - 1), vbuf))
-        _add_overlay(tile + 1, cell);
+        cell.add_overlay(tile + 1);
     if (ne == 0 && _is_seen_wall(coord_def(gc.x + 1, gc.y - 1), vbuf))
-        _add_overlay(tile + 3, cell);
+        cell.add_overlay(tile + 3);
 }
 
 static bool _is_seen_slimy_wall(const coord_def& gc, crawl_view_buffer &vbuf)
@@ -517,8 +534,8 @@ void pack_cell_overlays(const coord_def &gc, crawl_view_buffer &vbuf)
         if (feat_is_wall(cell.map_knowledge.feat()))
         {
             const int count = tile_dngn_count(TILE_DNGN_WALL_ICY_WALL_OVERLAY);
-            _add_overlay(TILE_DNGN_WALL_ICY_WALL_OVERLAY
-                    + (gc.y * GXM + gc.x) % count, cell);
+            cell.add_overlay(TILE_DNGN_WALL_ICY_WALL_OVERLAY
+                    + (gc.y * GXM + gc.x) % count);
         }
         else
         {

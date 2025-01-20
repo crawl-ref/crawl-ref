@@ -1630,12 +1630,7 @@ static void add_overlays(const coord_def& gc, screen_cell_t* cell)
            && tile_overlays[tile_overlay_i].gc == gc)
     {
         const auto &overlay = tile_overlays[tile_overlay_i];
-        if (cell->tile.num_dngn_overlay == 0
-            || cell->tile.dngn_overlay[cell->tile.num_dngn_overlay - 1]
-                                            != static_cast<int>(overlay.tile))
-        {
-            cell->tile.dngn_overlay[cell->tile.num_dngn_overlay++] = overlay.tile;
-        }
+        cell->tile.add_overlay(overlay.tile);
         tile_overlay_i++;
     }
 #endif

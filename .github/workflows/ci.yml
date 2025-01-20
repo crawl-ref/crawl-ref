@@ -467,7 +467,7 @@ jobs:
             pip install -r webserver/requirements/dev.py3.txt # use this until we have a repo-wide requirements.txt
         working-directory: crawl-ref/source
       - name: Install dependencies
-        run: ./deps.py --coverage
+        run: ./deps.py --coverage --build-opts TILES=1
         working-directory: .github/workflows
       - name: Setup ccache
         uses: hendrikmuhs/ccache-action@v1.2
@@ -479,7 +479,7 @@ jobs:
         run: "echo /usr/lib/ccache >> $GITHUB_PATH"
       - name: "Setup ccache: update symlinks"
         run: "/usr/sbin/update-ccache-symlinks"
-      - run: make -j$(nproc) catch2-tests
+      - run: make -j$(nproc) catch2-tests TILES=1
         working-directory: crawl-ref/source
       - name: Generate LCOV data
         working-directory: crawl-ref/source
