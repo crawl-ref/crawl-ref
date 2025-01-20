@@ -2482,7 +2482,7 @@ tileidx_t tileidx_player_mons()
     case MONS_CENTAUR_WARRIOR: return TILEP_MONS_CENTAUR_WARRIOR_MELEE;
     case MONS_YAKTAUR:         return TILEP_MONS_YAKTAUR_MELEE;
     case MONS_YAKTAUR_CAPTAIN: return TILEP_MONS_YAKTAUR_CAPTAIN_MELEE;
-    default:                   return tileidx_monster_base(mons, 0);
+    default:                   return tileidx_monster_base(mons, 0, you.in_water());
     }
 }
 
