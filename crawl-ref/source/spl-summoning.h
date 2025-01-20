@@ -72,6 +72,7 @@ void create_malign_gateway(coord_def point, beh_type beh, string cause,
 spret cast_malign_gateway(actor* caster, int pow, bool fail = false,
                           bool test = false);
 coord_def find_gateway_location(actor* caster);
+bool is_gateway_target(const actor& caster, coord_def location);
 spret cast_summon_forest(actor* caster, int pow, bool fail, bool test=false);
 spret cast_forge_blazeheart_golem(int pow, bool fail);
 

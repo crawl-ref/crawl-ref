@@ -1087,26 +1087,88 @@ bool can_cast_malign_gateway()
     return count_malign_gateways() < 1;
 }
 
+static bool _is_malign_gateway_summoning_spot(const actor& caster,
+    const coord_def location,
+    bool targeting)
+{
+    if (!in_bounds(location)
+        || !feat_is_malign_gateway_suitable(env.grid(location)))
+    {
+        return false;
+    }
+
+    const actor* const creature = actor_at(location);
+    if (creature)
+    {
+        if (!targeting)
+            return false;
+
+        if (creature->visible_to(&caster))
+            return false;
+    }
+
+    if (targeting)
+    {
+        for (adjacent_iterator ai(location); ai; ++ai)
+        {
+            const map_cell& map_info = env.map_knowledge(*ai);
+            if (map_info.seen() && feat_is_solid(map_info.feat()))
+                return false;
+        }
+    }
+    else if (count_neighbours_with_func(location, &feat_is_solid) != 0)
+        return false;
+
+    if (!caster.see_cell_no_trans(location))
+        return false;
+
+    return true;
+}
+
+bool is_gateway_target(const actor& caster, coord_def location)
+{
+    const coord_def delta = location - caster.pos();
+
+    // location is to close
+    if (delta.rdist() < 2)
+        return false;
+
+    int abs_x = abs(delta.x);
+    int abs_y = abs(delta.y);
+
+    // location isn't on one of the 8 compass directions
+    if (abs_x != 0 && abs_y != 0 && abs_x != abs_y)
+        return false;
+
+    // Monster range of vision is equal to player range of vision, so this
+    // is accurate for mosters to.
+    const int current_vision = you.current_vision;
+
+    // location is to far
+    if (abs_x > current_vision || abs_y > current_vision)
+        return false;
+
+    return _is_malign_gateway_summoning_spot(caster, location, true);
+}
+
 coord_def find_gateway_location(actor* caster)
 {
     vector<coord_def> points;
 
-    for (coord_def delta : Compass)
+    // Monster range of vision is equal to player range of vision, so this
+    // is accurate for mosters to.
+    const int current_vision = you.current_vision;
+
+    for (int i = 0; i < 8; ++i)
     {
-        coord_def test = coord_def(-1, -1);
+        const coord_def delta = Compass[i];
 
-        for (int t = 0; t < 11; t++)
+        for (int t = 2; t <= current_vision; ++t)
         {
-            test = caster->pos() + (delta * (2+t));
-            if (!in_bounds(test) || !feat_is_malign_gateway_suitable(env.grid(test))
-                || actor_at(test)
-                || count_neighbours_with_func(test, &feat_is_solid) != 0
-                || !caster->see_cell_no_trans(test))
-            {
-                continue;
-            }
+            const coord_def test = caster->pos() + delta * t;
 
-            points.push_back(test);
+            if (_is_malign_gateway_summoning_spot(*caster, test, false))
+                points.push_back(test);
         }
     }
 

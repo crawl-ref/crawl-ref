@@ -726,3 +726,11 @@ public:
     targeter_teleport_other(const actor *act, int range);
     bool valid_aim(coord_def a) override;
 };
+
+class targeter_malign_gateway : public targeter
+{
+public:
+    targeter_malign_gateway(actor& caster);
+    aff_type is_affected(coord_def loc) override;
+    bool valid_aim(coord_def) override { return true; }
+};

@@ -1385,9 +1385,12 @@ unique_ptr<targeter> find_spell_targeter(spell_type spell, int pow, int range)
     }
     case SPELL_FOXFIRE:
         return make_unique<targeter_maybe_radius>(&you, LOS_NO_TRANS, 1, 0, 1);
-    // TODO: these two actually have pretty wtf positioning that uses compass
-    // directions, so this targeter is not entirely accurate.
+
     case SPELL_MALIGN_GATEWAY:
+        return make_unique<targeter_malign_gateway>(you);
+
+    // TODO: this actually has pretty wtf positioning that uses compass
+    // directions, so this targeter is not entirely accurate.
     case SPELL_SUMMON_FOREST:
         return make_unique<targeter_radius>(&you, LOS_NO_TRANS, LOS_RADIUS,
                                             0, 2);
