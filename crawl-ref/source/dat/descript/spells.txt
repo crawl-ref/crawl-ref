@@ -840,7 +840,7 @@ You can stockpile enough malice to cast this spell at most three times, and this
 can only be replenished by causing the death of a sufficient number of living
 beings.
 %%%%
-Greater Servant of Makhleb spell
+Infernal Servant spell
 
 Summons a major demon.
 %%%%

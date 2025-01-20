@@ -3086,7 +3086,7 @@ static const struct spell_desc spelldata[] =
 },
 
 {
-    SPELL_GREATER_SERVANT_MAKHLEB, "Greater Servant of Makhleb",
+    SPELL_GREATER_SERVANT_MAKHLEB, "Infernal Servant",
     spschool::summoning,
     spflag::unholy | spflag::mons_abjure | spflag::monster,
     7,

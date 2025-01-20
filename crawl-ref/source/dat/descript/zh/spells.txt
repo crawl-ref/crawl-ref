@@ -577,7 +577,7 @@ Grasping Roots spell
 召唤来自地下深处的巨大抓握的根，抓住并束缚受害者。
 如果受害人挣脱或它离开召唤者的视野，则根会撤去。
 %%%%
-Greater Servant of Makhleb spell
+Infernal Servant spell
 
 召唤一个大恶魔。
 %%%%
