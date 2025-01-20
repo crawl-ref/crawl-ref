@@ -112,7 +112,13 @@ function TimedMarker:event(marker, ev)
   elseif ev:type() == dgn.dgn_event_type('player_los') then
     self:start_short(marker)
   elseif ev:type() == self.ticktype then
-    self.dur = self.dur - ev:ticks()
+    local x, y = marker:pos()
+    local yx, yy = you.pos()
+    if x == yx and y == yy and you.taking_stairs() and self.dur > 1 then
+      self.dur = 1
+    else
+      self.dur = self.dur - ev:ticks()
+    end
     self.msg:event(self, marker, ev)
     if self.dur <= 0 then
       self:timeout(marker, true)
