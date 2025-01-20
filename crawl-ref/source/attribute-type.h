@@ -105,5 +105,6 @@ enum attribute_type
 #endif
     ATTR_DEATHS_DOOR_HP,       // How much HP we should have under Death's Door
     ATTR_VOUCHER,              // How many shop vouchers you have
+    ATTR_TRAITOR,              // God who has been abandoned with an invocations title
     NUM_ATTRIBUTES
 };

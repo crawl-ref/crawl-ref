@@ -616,6 +616,14 @@ god_iterator god_iterator::operator++(int)
     return copy;
 }
 
+void handle_traitor(god_type god)
+{
+    if (static_cast<god_type>(you.attribute[ATTR_TRAITOR]) == god)
+        {
+            you.attribute[ATTR_TRAITOR] = 0;
+            you.redraw_title = true;
+        }
+}
 
 bool active_penance(god_type god)
 {
@@ -751,6 +759,8 @@ void dec_penance(god_type god, int val)
         you.penance[god] -= val;
         return;
     }
+
+    handle_traitor(god);
 
     // We only get this far if we just mollified a god.
     // If we just mollified a god, see if we have any angry gods left.
@@ -2827,6 +2837,12 @@ void excommunication(bool voluntary, god_type new_god)
 
     you.religion = GOD_NO_GOD;
 
+    if (best_skill(SK_FIRST_SKILL, SK_LAST_SKILL) == SK_INVOCATIONS
+       && you.attribute[ATTR_TRAITOR] == 0)
+    {
+        you.attribute[ATTR_TRAITOR] = static_cast<int>(old_god);
+    }
+
     you.redraw_title = true;
 
     // Renouncing may have changed the conducts on our wielded or
@@ -3542,6 +3558,8 @@ static void _set_initial_god_piety()
         you.gift_timeout = 0;
         break;
     }
+
+    handle_traitor(you.religion);
 
     // Tutorial needs berserk usable.
     if (crawl_state.game_is_tutorial())

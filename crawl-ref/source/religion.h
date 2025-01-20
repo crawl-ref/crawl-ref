@@ -42,6 +42,7 @@ string wu_jian_random_sifu_name();
 god_type str_to_god(const string &name, bool exact = true);
 
 int initial_wrath_penance_for(god_type god);
+void handle_traitor(god_type god);
 bool active_penance(god_type god);
 bool xp_penance(god_type god);
 void dec_penance(int val);
